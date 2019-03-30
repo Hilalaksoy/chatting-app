@@ -27,8 +27,8 @@ class Media(models.Model):
 	)
 
 	name = models.CharField(max_length=64, blank=False, null=False)
-	media_type = models.CharField(max_length=1,choices=MEDIA_TYPE_CHOICES,default=NOT_DEFINED)
-	file = models.FileField(blank=False,null=False,upload_to='chatMe_media')
+	media_type = models.CharField(max_length=1, choices=MEDIA_TYPE_CHOICES, default=NOT_DEFINED)
+	file = models.FileField(blank=False, null=False, upload_to='chatMe_media')
 
 	def __str__(self):
 		return self.name
@@ -37,35 +37,42 @@ class Media(models.Model):
 		verbose_name = 'Media element'
 
 
+class UserProfileImage(models.Model):
+	user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='profile_image', on_delete=models.CASCADE)
+	image = ImageField(blank=True, null=True, upload_to='thumbnails/users')
+
 class Group(models.Model):
-	group_name=models.CharField(max_length=64)
-	group_date=models.DateTimeField(auto_now=True)
-	group_admin=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
-	group_image=models.ForeignKey(Media,on_delete=models.CASCADE)
+	name = models.CharField(max_length=64)
+	create_date = models.DateTimeField(auto_now=True)
+	admin = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='managed_groups', on_delete=models.CASCADE)
+	image = ImageField(blank=True, null=True, upload_to='thumbnails/groups')
+	users = models.ManyToManyField(settings.AUTH_USER_MODEL)
+
+	def __str__(self):
+		return self.name
+
+	class Meta:
+		verbose_name = 'Chat group'
 
 
 class Message(models.Model):
 	"""Mesaj türü  tek bir kullanıcıya ,bir grup kullanıcıya veya sunucuya bağlı tüm kullanılara gönderilecek şekilde olabilir."""
 	NOT_DEFINED = 'N'
 	SINGLE_USER = 'S'
-	GROUP_USERS = 'G'
-	ALL_SERVER  = 'A'
-	MESSAGE_TYPE_CHOICES = (
-		(NOT_DEFINED, 'Not defined'),
-		(SINGLE_USER, 'Single_User'),
-		(GROUP_USERS, 'Group_Users'),
-		(ALL_SERVER, 'All_Server'),
+	GROUP_CONVERSATION = 'G'
+	ALL_USERS  = 'A'
+	MESSAGE_DESTINATION_CHOICES = (
+		(NOT_DEFINED, 'not_defined'),
+		(SINGLE_USER, 'Single user'),
+		(GROUP_CONVERSATION, 'Group'),
+		(ALL_USERS, 'All users'),
 	)
-	message_sender=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name='sent_messages',verbose_name="Mesaj Gönderen")
-	message_receiver=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name='receiver_messages')
-	message_content=models.CharField(max_length=150)
-	message_date=models.DateTimeField(auto_now=True)
-	message_type=models.CharField(max_length=1,choices=MESSAGE_TYPE_CHOICES,default=NOT_DEFINED)
-	message_group=models.ForeignKey(Group,on_delete=models.CASCADE)
-	message_status=models.BooleanField(default=False)
-	message_media=models.ForeignKey(Media,on_delete=models.CASCADE)
 
-
-class GroupUser(models.Model):
-	groupUser_user=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
-	groupUser_group=models.ForeignKey(Group,on_delete=models.CASCADE)
+	sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_messages')
+	receiver = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE, related_name='receiver_messages')
+	group = models.ForeignKey(Group, null=True, on_delete=models.CASCADE)
+	type = models.CharField(max_length=1, choices=MESSAGE_DESTINATION_CHOICES, default=NOT_DEFINED)
+	content = models.CharField(max_length=512)
+	date = models.DateTimeField(auto_now=True)
+	media = models.ForeignKey(Media, null=True, on_delete=models.CASCADE)
+	has_been_read = models.BooleanField(default=False)

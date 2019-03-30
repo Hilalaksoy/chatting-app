@@ -5,4 +5,3 @@ from chatMe.models import *
 admin.site.register(Media)
 admin.site.register(Message)
 admin.site.register(Group)
-admin.site.register(GroupUser)

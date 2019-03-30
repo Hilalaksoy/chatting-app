@@ -20,15 +20,14 @@ from chatting_django.apis import GetToken
 from chatting_django import settings
 from chatMe.urls import chatMe_urlpatterns
 from chatMe.urls import chatMe_router
-from chatMe.views import index
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('get-token/', GetToken.as_view()),
-    path('',index),
 ]
 
-urlpatterns += chatMe_router.urls
-urlpatterns += chatMe_urlpatterns
+urlpatterns = chatMe_router.urls + urlpatterns
+urlpatterns = chatMe_urlpatterns + urlpatterns
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
