@@ -20,10 +20,11 @@ from chatting_django.apis import GetToken
 from chatting_django import settings
 from chatMe.urls import chatMe_urlpatterns
 from chatMe.urls import chatMe_router
-
+from chatMe.views import index
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('get-token/', GetToken.as_view(), name='gettoken'),
+    path('get-token/', GetToken.as_view()),
+    path('',index),
 ]
 
 urlpatterns += chatMe_router.urls

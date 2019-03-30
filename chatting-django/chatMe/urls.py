@@ -7,5 +7,5 @@ chatMe_router = routers.DefaultRouter()
 # vcase_router.register('vcase-api/cases',VCaseViewSet)
 
 chatMe_urlpatterns = [
-
+        
 ]
