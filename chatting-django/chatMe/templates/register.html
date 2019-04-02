@@ -24,48 +24,35 @@
 			<div class="wrap-login100">
 				<div class="login100-form-title" style="background-image: url({% static 'images/bg-01.jpg'%});">
 					<span class="login100-form-title-1">
-						Giriş Yap
+						Kayıt Ol
 					</span>
 				</div>
 
-				<form action="/login/" method="post" class="login100-form validate-form">
+				<form action="/register/" method="post" class="login100-form validate-form">
 					<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
 					{% if errors %}
 					<small id="errors" class="form-text" style="color:#f02424;">Kullanıcı adınız veya şifreniz yanlıştır.</small>
 					{% endif %}
-					<div class="wrap-input100 validate-input m-b-26" data-validate="Username is required">
-						<input class="input100" type="text" name="username" placeholder="Kullanıcı Adını gir">
+					<div class="wrap-input100 validate-input m-b-26" data-validate="Lütfen kullanıcı adınızı yazınız">
+						<input class="input100" type="text" name="username" placeholder="Kullanıcı Adı Oluştur">
+						<span class="focus-input100"></span>
+					</div>
+          <div class="wrap-input100 validate-input m-b-26" data-validate="Lütfen epostanızı yazınız">
+						<input class="input100" type="text" name="email" placeholder="Eposta Oluştur">
 						<span class="focus-input100"></span>
 					</div>
 
-					<div class="wrap-input100 validate-input m-b-18" data-validate = "Parola gereklidir">
-						<input class="input100" type="password" name="password" placeholder="parola gir">
+					<div class="wrap-input100 validate-input m-b-18" data-validate = "Lütfen şifrenizi yazınız">
+						<input class="input100" type="password" name="password" placeholder="Parola Oluştur">
 						<span class="focus-input100"></span>
 					</div>
 
-					<div class="flex-sb-m w-full p-b-30">
-						<div class="contact100-form-checkbox">
-							<input class="input-checkbox100" id="ckb1" type="checkbox" name="remember-me">
-							<label class="label-checkbox100" for="ckb1">
-								Hatırla beni
-							</label>
-						</div>
-
-						<div>
-							<a href="#" class="txt1">
-								Parolanı mı unuttun?
-							</a>
-						</div>
-					</div>
 
 					<div class="container-login100-form-btn">
 						<button type="submit" class="login100-form-btn">
-							Giriş
+						 Kaydol
 						</button>
 					</div>
-          <div>
-            <a href="/register">Kayıt Ol</a>
-          </div>
 
 				</form>
 			</div>
