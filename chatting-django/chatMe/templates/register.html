@@ -31,7 +31,7 @@
 				<form action="/register/" method="post" class="login100-form validate-form">
 					<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
 					{% if errors %}
-					<small id="errors" class="form-text" style="color:#f02424;">Kullanıcı adınız veya şifreniz yanlıştır.</small>
+					<small id="errors" class="form-text" style="color:#f02424;">{{ errors }}</small>
 					{% endif %}
 					<div class="wrap-input100 validate-input m-b-26" data-validate="Lütfen kullanıcı adınızı yazınız">
 						<input class="input100" type="text" name="username" placeholder="Kullanıcı Adı Oluştur">

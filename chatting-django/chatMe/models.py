@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from sorl.thumbnail import ImageField
 from django.conf import settings
+from libgravatar import Gravatar
 
 # Create your models here.
 
@@ -39,13 +40,13 @@ class Media(models.Model):
 
 class UserProfileImage(models.Model):
 	user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='profile_image', on_delete=models.CASCADE)
-	image = ImageField(blank=True, null=True, upload_to='thumbnails/users')
+	image = models.CharField(max_length=512, null=True)
 
 class Group(models.Model):
 	name = models.CharField(max_length=64)
 	create_date = models.DateTimeField(auto_now=True)
 	admin = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='managed_groups', on_delete=models.CASCADE)
-	image = ImageField(blank=True, null=True, upload_to='thumbnails/groups')
+	image = models.CharField(max_length=512, null=True)
 	users = models.ManyToManyField(settings.AUTH_USER_MODEL)
 
 	def __str__(self):
@@ -53,6 +54,10 @@ class Group(models.Model):
 
 	class Meta:
 		verbose_name = 'Chat group'
+
+	def save(self, *args, **kwargs):
+		self.image = Gravatar(self.name + '@chatme.com').get_profile()
+		super(Model, self).save(*args, **kwargs)
 
 
 class Message(models.Model):
@@ -70,9 +75,12 @@ class Message(models.Model):
 
 	sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_messages')
 	receiver = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE, related_name='receiver_messages')
-	group = models.ForeignKey(Group, null=True, on_delete=models.CASCADE)
-	type = models.CharField(max_length=1, choices=MESSAGE_DESTINATION_CHOICES, default=NOT_DEFINED)
+	group = models.ForeignKey(Group,blank=True, null=True, on_delete=models.CASCADE)
+	type = models.CharField(max_length=1,blank=True, choices=MESSAGE_DESTINATION_CHOICES, default=NOT_DEFINED)
 	content = models.CharField(max_length=512)
 	date = models.DateTimeField(auto_now=True)
-	media = models.ForeignKey(Media, null=True, on_delete=models.CASCADE)
+	media = models.ForeignKey(Media,blank=True, null=True, on_delete=models.CASCADE)
 	has_been_read = models.BooleanField(default=False)
+
+	def __str__(self):
+		return self.content
