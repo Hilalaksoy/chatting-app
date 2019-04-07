@@ -4,7 +4,7 @@ You need to have `npm` and `nodejs` installed, if you do not please install them
 
 ### For node packages setup please run the following commands in this dir:
 
-#### Activate the environment:
+#### Install packages:
 ```
 $ npm install
 ```
