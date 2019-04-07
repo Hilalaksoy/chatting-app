@@ -2,7 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from sorl.thumbnail import ImageField
 from django.conf import settings
-from libgravatar import Gravatar
+import hashlib
+import urllib
+
+def gravatar_url(email, size=50):
+	return "https://www.gravatar.com/avatar/%s?%s" % (hashlib.md5(email.lower().encode('utf-8')).hexdigest(), urllib.parse.urlencode({'d':'identicon', 's':str(size)}))
 
 # Create your models here.
 
@@ -46,7 +50,7 @@ class Group(models.Model):
 	name = models.CharField(max_length=64)
 	create_date = models.DateTimeField(auto_now=True)
 	admin = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='managed_groups', on_delete=models.CASCADE)
-	image = models.CharField(max_length=512, null=True)
+	image = models.CharField(max_length=512,blank=True, null=True)
 	users = models.ManyToManyField(settings.AUTH_USER_MODEL)
 
 	def __str__(self):
@@ -56,8 +60,8 @@ class Group(models.Model):
 		verbose_name = 'Chat group'
 
 	def save(self, *args, **kwargs):
-		self.image = Gravatar(self.name + '@chatme.com').get_profile()
-		super(Model, self).save(*args, **kwargs)
+		self.image = gravatar_url( self.admin.username + '@chatme.com')
+		super().save(*args, **kwargs)
 
 
 class Message(models.Model):
