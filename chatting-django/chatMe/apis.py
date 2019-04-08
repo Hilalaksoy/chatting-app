@@ -70,3 +70,54 @@ class ValidateToken(APIView):
 		return Response({
 			'valid': True
 		})
+
+
+class CreateGroup(APIView):
+	authentication_classes = (authentication.TokenAuthentication,)
+
+	def get(self, request, *args, **kwargs):
+		group_name = ''
+		try:
+			group_name = request.GET.get('name', '')
+			if Group.objects.filter(name=group_name).first() is not None:
+				return Response({
+					'created': False
+				})
+			else:
+				g = Group.objects.create(
+				name=group_name,
+				admin=request.user,
+				image=gravatar_url(request.user.username +'@chat.me')
+				)
+				g.users.add(request.user)
+		except:
+			return Response({
+				'created': False
+			})
+
+		return Response({
+			'created': True
+		})
+
+
+class JoinGroup(APIView):
+	authentication_classes = (authentication.TokenAuthentication,)
+
+	def get(self, request, *args, **kwargs):
+		group_name = ''
+		try:
+			group_name = request.GET.get('name', '')
+			g = Group.objects.filter(name=group_name).first()
+			if g is not None and request.user not in g.users.all():
+				g.users.add(request.user)
+				return Response({
+					'joined': True
+				})
+			else:
+				return Response({
+					'joined': False
+				})
+		except:
+			return Response({
+				'joined': False
+			})

@@ -8,7 +8,7 @@ var request = require('request');
 
 const TOKEN = getToken('chatting_node', 'chatmeee');
 
-app.listen(5000);
+app.listen(5000, "0.0.0.0");
 
 function handler (req, res) {
   fs.readFile(__dirname + '/index.html',
@@ -81,7 +81,9 @@ io.on('connection', function(socket) {
 	    function (error, response, body) {
 	      if (!error && response.statusCode == 201) {
 					var message = body;
+					console.log(message);
 					message.receiver = message.receiver + '';
+					console.log(connections);
 					if (message.type == 'S') { //single user
 						if (getKeyByValue(connections, message.receiver) != undefined) {
 							io.to(getKeyByValue(connections, message.receiver)).emit('add-message', message);
@@ -106,14 +108,6 @@ io.on('connection', function(socket) {
 
 });
 
-//
-// setInterval(() => {
-// 	Object.keys(connections).forEach(function(socket_id) {
-// 		if (connections[socket_id] == -1) {
-// 			delete connections[socket_id];
-// 		}
-// 	});
-// }, 600000);
 
 function syncValidateUser(_token, _user_id) {
 	var res = sync_request('POST', 'http://localhost:8000/api/validate-token/', {

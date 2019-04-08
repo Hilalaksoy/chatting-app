@@ -102,8 +102,8 @@
   			</ul>
   		</div>
   		<div id="bottom-bar">
-  			<button id="addcontact"><i class="fa fa-user-plus fa-fw" aria-hidden="true"></i> <span>Add contact</span></button>
-  			<button id="settings"><i class="fa fa-cog fa-fw" aria-hidden="true"></i> <span>Settings</span></button>
+  			<button id="joingroup"><span>Join group</span></button>
+  			<button id="creategroup"><span>Create group</span></button>
   		</div>
   	</div>
   	<div class="content" id="content">
@@ -117,7 +117,8 @@
   <script>
 
   var TOKEN = '{{ token }}';
-	var socket = io.connect('http://localhost:5000/', {query: 'user_id={{current_user.id}}&token=' + TOKEN});
+	var socket_url = $(location).attr("href").replace('8000', '5000');
+	var socket = io.connect(socket_url, {query: 'user_id={{current_user.id}}&token=' + TOKEN});
 
 
   // $("#profile-img").on('click', function() {
@@ -286,6 +287,7 @@
 	});
 
 	socket.on('add-message', function(content) {
+		console.log(content)
 		if (content['type'] == 'S' ) {
 			var contact = $('#contacts').find('ul .active')[0];
 			if (contact !== undefined) {
@@ -391,7 +393,50 @@
 
 	$(".messages").animate({ scrollTop: $(".messages").prop('scrollHeight') }, "fast");
 
+	$("#creategroup").on( 'click', () => {
+		var group_name = prompt("Grubun ismini giriniz",  "{{ current_user.username }}" + " grubu");
+    $.ajax({
+        type : "GET",
+        url : "/api/create-group/?name=" + group_name,
+				beforeSend: function(request) {
+    			request.setRequestHeader("Authorization", "Token " + TOKEN);
+  			},
+        success: function(answer){
+					if (answer['created']) {
+						alert('Grup oluşturulmuştur.')
+						location = location
+					} else {
+						alert('Grup oluşturulamamıştur. Grubun ismini değştirmeyi deneyiniz.')
+					}
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+          alert("some error " + String(errorThrown) + String(textStatus) + String(XMLHttpRequest.responseText));
+      }
+  	});
+	});
 
+	$("#joingroup").on('click', () => {
+		var group_name = prompt("Grubun ismini giriniz",  '');
+    $.ajax({
+        type : "GET",
+        url : "/api/join-group/?name=" + group_name,
+				beforeSend: function(request) {
+    			request.setRequestHeader("Authorization", "Token " + TOKEN);
+  			},
+        success: function(answer){
+					console.log(answer)
+					if (answer['joined']) {
+						alert('Gruba katılımınız sağlanmıştır.')
+						location = location
+					} else {
+						alert('Gruba katılımınız sağlanamamıştır. Grubun ismini kontrol ediniz.')
+					}
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+          alert("some error " + String(errorThrown) + String(textStatus) + String(XMLHttpRequest.responseText));
+      }
+  	});
+	});
   </script>
 </body>
 </html>
