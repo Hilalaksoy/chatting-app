@@ -6,6 +6,8 @@ var querystring = require('querystring');
 var sync_request = require('sync-request');
 var request = require('request');
 
+const TOKEN = getToken('chatting_node', 'chatmeee');
+
 app.listen(5000);
 
 function handler (req, res) {
@@ -46,7 +48,7 @@ io.on('connection', function(socket) {
 		{
 			headers: {
 				'Content-Type': 'application/json',
-				'Authorization': 'Token da2a5503f0d254eb58c22f0e165d655a192fb12d'
+				'Authorization': 'Token ' + TOKEN
 			}
 		}, function (error, response, body) {
 			if (!error && response.statusCode == 200) {
@@ -73,7 +75,7 @@ io.on('connection', function(socket) {
 				json: content,
 				headers: {
 					'Content-Type': 'application/json',
-					'Authorization': 'Token da2a5503f0d254eb58c22f0e165d655a192fb12d'
+					'Authorization': 'Token ' + TOKEN
 		  	}
 			},
 	    function (error, response, body) {
@@ -118,9 +120,20 @@ function syncValidateUser(_token, _user_id) {
 	  json: { user_id: _user_id, token: _token },
 		headers: {
 			'Content-Type': 'application/json',
-			'Authorization': 'Token da2a5503f0d254eb58c22f0e165d655a192fb12d'
+			'Authorization': 'Token ' + TOKEN
   	}
 	});
 	var res = JSON.parse(res.getBody('utf8'));
 	return res['valid'];
+}
+
+function getToken(user_name, password) {
+	var res = sync_request('POST', 'http://localhost:8000/get-token/', {
+	  json: { username: user_name, password: password },
+		headers: {
+			'Content-Type': 'application/json'
+  	}
+	});
+	var res = JSON.parse(res.getBody('utf8'));
+	return res['token'];
 }
